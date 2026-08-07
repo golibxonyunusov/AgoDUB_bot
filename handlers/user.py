@@ -20,6 +20,7 @@ router = Router()
 IMG_WELCOME = "images/welcome.png"
 IMG_SEARCH = "images/search.png"
 IMG_FAVORITES = "images/favorites.png"
+IMG_ALL_ANIME = "images/all_anime.png"
 
 
 class SearchState(StatesGroup):
@@ -123,6 +124,7 @@ async def search_process(message: Message, state: FSMContext):
 @router.message(F.text == "📋 Barcha animelar")
 async def list_all(message: Message, state: FSMContext):
     await state.clear()
+    await message.answer_photo(FSInputFile(IMG_ALL_ANIME))
     await send_anime_page(message, scope="all", page=0, user_id=message.from_user.id)
 
 
