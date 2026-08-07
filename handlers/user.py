@@ -73,7 +73,12 @@ async def search_start(message: Message, state: FSMContext):
     await state.set_state(SearchState.waiting_query)
     await message.answer_photo(
         FSInputFile(IMG_SEARCH),
-        caption="🔎 Anime nomini yoki <b>ID</b> raqamini yuboring:",
+        caption=(
+            "🔎 <b>Qidiruv vaqti keldi!</b>\n\n"
+            "Anime nomini (masalan: <i>Naruto</i>) yoki uning <b>ID</b> raqamini "
+            "yozib yuboring — men bir zumda topib beraman ⚡\n\n"
+            "Bekor qilish uchun pastdagi tugmani bosing 👇"
+        ),
         reply_markup=kb.cancel_kb(),
     )
 
@@ -124,14 +129,12 @@ async def search_process(message: Message, state: FSMContext):
 @router.message(F.text == "📋 Barcha animelar")
 async def list_all(message: Message, state: FSMContext):
     await state.clear()
-    await message.answer_photo(FSInputFile(IMG_ALL_ANIME))
     await send_anime_page(message, scope="all", page=0, user_id=message.from_user.id)
 
 
 @router.message(F.text == "⭐ Sevimlilar")
 async def list_favorites(message: Message, state: FSMContext):
     await state.clear()
-    await message.answer_photo(FSInputFile(IMG_FAVORITES))
     await send_anime_page(message, scope="fav", page=0, user_id=message.from_user.id)
 
 
@@ -140,27 +143,46 @@ async def send_anime_page(message: Message, scope: str, page: int, user_id: int,
         total = await db.count_anime()
         total_pages = max(1, math.ceil(total / ANIME_PER_PAGE))
         rows = await db.get_all_anime(page, ANIME_PER_PAGE)
-        title = f"📋 <b>Barcha animelar</b> ({total} ta)"
-        if not rows:
-            title = "📋 Hozircha bazada anime yo'q."
+        if rows:
+            title = (
+                f"📋 <b>Barcha animelar</b>\n\n"
+                f"Bazamizda jami <b>{total}</b> ta anime bor 🎬 "
+                f"Kerakli animeni tanlang 👇"
+            )
+        else:
+            title = (
+                "😔 <b>Hozircha bazada anime yo'q</b>\n\n"
+                "Tez orada eng sara animelar bilan to'ldiramiz — kuzatib boring! 🍥"
+            )
+        banner = IMG_ALL_ANIME
     else:
         favs = await db.get_favorites(user_id)
         total_pages = max(1, math.ceil(len(favs) / ANIME_PER_PAGE))
         start = page * ANIME_PER_PAGE
         rows = favs[start:start + ANIME_PER_PAGE]
-        title = f"⭐ <b>Sevimli animelaringiz</b> ({len(favs)} ta)"
-        if not favs:
-            title = "⭐ Sizda hali sevimli animelar yo'q.\n\nAnime sahifasida ⭐ tugmasini bosib qo'shishingiz mumkin."
+        if favs:
+            title = (
+                f"⭐ <b>Sevimli animelaringiz</b>\n\n"
+                f"Jami <b>{len(favs)}</b> ta anime saqlangan 💜 "
+                f"Xohlagan animeni tanlang 👇"
+            )
+        else:
+            title = (
+                "💜 <b>Sevimlilar ro'yxati hali bo'sh</b>\n\n"
+                "Yoqtirgan animeningizni topib, uning sahifasida ⭐ tugmasini bosing — "
+                "u shu yerga qo'shiladi!"
+            )
+        banner = IMG_FAVORITES
 
     markup = kb.anime_list_kb(rows, scope=scope, page=page, total_pages=total_pages) if rows else None
 
     if edit and cb:
         try:
-            await cb.message.edit_text(title, reply_markup=markup)
+            await cb.message.edit_caption(caption=title, reply_markup=markup)
         except TelegramBadRequest:
             pass
     else:
-        await message.answer(title, reply_markup=markup)
+        await message.answer_photo(FSInputFile(banner), caption=title, reply_markup=markup)
 
 
 @router.callback_query(kb.PageCB.filter(F.scope.in_(["all", "fav"])))
