@@ -11,7 +11,7 @@
 # ============================================================
 import os
 
-BOT_TOKEN = os.environ.get("BOT_TOKEN", "PASTE_YOUR_BOT_TOKEN_HERE")
+BOT_TOKEN = os.environ.get("BOT_TOKEN", "8977994406:AAF1AYuiR3gKJeQ84JzsR3Ji4Hx17eLycz0")
 
 ADMIN_IDS = [
     8888728779,  # <-- shu yerga o'z Telegram ID raqamingizni yozing
