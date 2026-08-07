@@ -1,12 +1,17 @@
 # ============================================================
-#  UzumDub Studio Bot — Konfiguratsiya
+#  EgoDUBING Bot — Konfiguratsiya
 # ============================================================
-# 1) @BotFather dan olingan tokenni pastga qo'ying
+# 1) BOT_TOKEN endi shu faylga emas, Render'dagi "Environment"
+#    bo'limiga kiritiladi (xavfsizlik uchun). Lokalda ishga
+#    tushirish uchun terminalda quyidagini yozing:
+#      export BOT_TOKEN="123456:ABC..."   (Linux/Mac)
+#      set BOT_TOKEN=123456:ABC...        (Windows)
 # 2) O'zingizning Telegram ID raqamingizni ADMIN_IDS ro'yxatiga qo'shing
 #    (ID ni bilmasangiz @userinfobot ga /start yozing)
 # ============================================================
+import os
 
-BOT_TOKEN = "8977994406:AAF1AYuiR3gKJeQ84JzsR3Ji4Hx17eLycz0"
+BOT_TOKEN = os.environ.get("BOT_TOKEN", "PASTE_YOUR_BOT_TOKEN_HERE")
 
 ADMIN_IDS = [
     8888728779,  # <-- shu yerga o'z Telegram ID raqamingizni yozing
@@ -14,7 +19,7 @@ ADMIN_IDS = [
 
 DB_NAME = "uzumdub.db"
 
-STUDIO_NAME = "UzumDub Studio"
+STUDIO_NAME = "EgoDUBING"
 
 # Bosh menyudagi banner matni (ixtiyoriy, /start da chiqadi)
 WELCOME_TEXT = (
