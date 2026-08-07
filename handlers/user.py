@@ -3,7 +3,7 @@ from aiogram import Router, F
 from aiogram.filters import CommandStart, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from aiogram.types import Message, CallbackQuery, InputMediaPhoto
+from aiogram.types import Message, CallbackQuery, InputMediaPhoto, FSInputFile
 from aiogram.exceptions import TelegramBadRequest
 
 import database as db
@@ -11,6 +11,15 @@ import keyboards as kb
 from config import ADMIN_IDS, WELCOME_TEXT, STUDIO_NAME, ANIME_PER_PAGE, EPISODES_PER_PAGE
 
 router = Router()
+
+# ---------------------------------------------------------------
+# BANNER RASMLARI
+# ---------------------------------------------------------------
+# Loyiha ildizidagi images/ papkasida saqlanadi (bot.py bilan bir
+# joyda). Repo'ga shu papkani ham qo'shishni unutmang.
+IMG_WELCOME = "images/welcome.png"
+IMG_SEARCH = "images/search.png"
+IMG_FAVORITES = "images/favorites.png"
 
 
 class SearchState(StatesGroup):
@@ -29,7 +38,11 @@ async def cmd_start(message: Message, state: FSMContext):
     await state.clear()
     await db.add_user(message.from_user.id, message.from_user.username, message.from_user.full_name)
     text = WELCOME_TEXT.format(studio=STUDIO_NAME)
-    await message.answer(text, reply_markup=kb.main_menu_kb(is_admin(message.from_user.id)))
+    await message.answer_photo(
+        FSInputFile(IMG_WELCOME),
+        caption=text,
+        reply_markup=kb.main_menu_kb(is_admin(message.from_user.id)),
+    )
 
 
 @router.message(F.text == "⬅️ Bosh menyu")
@@ -57,8 +70,9 @@ async def help_handler(message: Message):
 @router.message(F.text == "🔎 Qidirish")
 async def search_start(message: Message, state: FSMContext):
     await state.set_state(SearchState.waiting_query)
-    await message.answer(
-        "🔎 Anime nomini yoki <b>ID</b> raqamini yuboring:",
+    await message.answer_photo(
+        FSInputFile(IMG_SEARCH),
+        caption="🔎 Anime nomini yoki <b>ID</b> raqamini yuboring:",
         reply_markup=kb.cancel_kb(),
     )
 
@@ -115,6 +129,7 @@ async def list_all(message: Message, state: FSMContext):
 @router.message(F.text == "⭐ Sevimlilar")
 async def list_favorites(message: Message, state: FSMContext):
     await state.clear()
+    await message.answer_photo(FSInputFile(IMG_FAVORITES))
     await send_anime_page(message, scope="fav", page=0, user_id=message.from_user.id)
 
 
