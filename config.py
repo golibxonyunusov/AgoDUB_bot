@@ -6,10 +6,10 @@
 #    (ID ni bilmasangiz @userinfobot ga /start yozing)
 # ============================================================
 
-BOT_TOKEN = "PASTE_YOUR_BOT_TOKEN_HERE"
+BOT_TOKEN = "8977994406:AAF1AYuiR3gKJeQ84JzsR3Ji4Hx17eLycz0"
 
 ADMIN_IDS = [
-    123456789,  # <-- shu yerga o'z Telegram ID raqamingizni yozing
+    8888728779,  # <-- shu yerga o'z Telegram ID raqamingizni yozing
 ]
 
 DB_NAME = "uzumdub.db"
